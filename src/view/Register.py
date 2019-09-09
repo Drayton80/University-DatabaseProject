@@ -11,35 +11,34 @@ from model.Accounts import Accounts
 
 from control.Validator import Validator
 from control.exceptions.EmptyFieldException import EmptyFieldException
-from control.exceptions.WrongPasswordException import WrongPasswordException
+from control.exceptions.RepeatedPrimaryKeyException import RepeatedPrimaryKeyException
 
-class Login():
+class Register():
     def show(self):
         ViewPartition().border_logo()
-        print("Preencha os campos de Login (deixe-os vazio caso queira retornar ao menu)")
+        print("Preencha os campos de Registro (deixe-os vazio caso queira retornar ao menu)")
         
         while True:
             try:
-                user_name = InputField().show("Nome de Usuário> ")
-                password  = InputField().show("Senha> ", show_divisory=False)
+                complete_name = InputField().show("Nome Completo> ")
+                complete_name = Validator().validate_empty_field(complete_name, "Nome Completo")
+
+                user_name = InputField().show("Nome de Usuário> ", show_divisory=False)
                 user_name = Validator().validate_empty_field(user_name, "Nome de Usuário")
+
+                password  = InputField().show("Senha> ", show_divisory=False)
                 password  = Validator().validate_empty_field(password, "Senha")
             
-                user = Accounts().login_user(user_name, password)
+                user = Accounts().register_user(user_name, complete_name, password)
 
-                if not user:
-                    ViewPartition().border_logo()
-                    print("Está conta não existe, tente novamente")
-                    continue
-                else:
-                    return user
-                
-            except WrongPasswordException:
-                ViewPartition().border_logo()
-                print("Senha incorreta, por favor, tente novamente")
+                return user
 
             except EmptyFieldException as exception:
                 raise EmptyFieldException(exception.field_name)
+
+            except RepeatedPrimaryKeyException:
+                ViewPartition().border_logo()
+                print("Nome de Usuário já existe")
 
             except ValueError:
                 ViewPartition().border_logo()
@@ -49,4 +48,7 @@ class Login():
                 ViewPartition().border_logo()
                 traceback.print_exc()
                 print("Algo deu errado, tente novamente")
+
+        
+
 
