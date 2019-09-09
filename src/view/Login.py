@@ -21,8 +21,9 @@ class Login():
         while True:
             try:
                 user_name = InputField().show("Nome de Usuário> ")
-                password  = InputField().show("Senha> ", show_divisory=False)
                 user_name = Validator().validate_empty_field(user_name, "Nome de Usuário")
+
+                password  = InputField().show("Senha> ", show_divisory=False)
                 password  = Validator().validate_empty_field(password, "Senha")
             
                 user = Accounts().login_user(user_name, password)

@@ -12,6 +12,33 @@ from control.exceptions.RepeatedPrimaryKeyException import RepeatedPrimaryKeyExc
 class Accounts:
     connection = Connection()
 
+    def update_user(self, user_name, complete_name, password, biography, privacy):
+        pass
+
+    def get_user(self, user_name):
+        cursor = self.connection.start_database_connection()
+        
+        try:
+            user_name = str(user_name)
+            
+            cursor.execute("select * from perfil where nome_usuario=%s", [user_name])
+            user = cursor.fetchall()
+
+            self.connection.close_database_connection()
+            return user
+
+        except ValueError:
+            self.connection.close_database_connection()
+            raise ValueError
+
+        except WrongPasswordException:
+            self.connection.close_database_connection()
+            raise WrongPasswordException
+
+        except Exception:
+            self.connection.close_database_connection()
+            raise Exception
+
     def login_user(self, user_name, password):
         cursor = self.connection.start_database_connection()
         
@@ -75,8 +102,29 @@ class Accounts:
             self.connection.close_database_connection()
             raise Exception
 
-    def update_user(self):
-        pass
+    def search_users(self, user_name_fragment):
+        cursor = self.connection.start_database_connection()
+        
+        try:
+            user_name_fragment = str(user_name_fragment)
+            search_parameter = '%' + user_name_fragment + '%'
+            
+            cursor.execute("select * from perfil where nome_usuario like %s", [search_parameter])
+            users = cursor.fetchall()
 
-    def get_users(self, users):
-        pass
+            self.connection.close_database_connection()
+            return users
+
+        except ValueError:
+            self.connection.close_database_connection()
+            raise ValueError
+
+        except WrongPasswordException:
+            self.connection.close_database_connection()
+            raise WrongPasswordException
+
+        except Exception:
+            self.connection.close_database_connection()
+            raise Exception
+
+    

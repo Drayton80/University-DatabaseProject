@@ -4,6 +4,9 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.join('..')))
 
+from model.Accounts import Accounts
+
+from view.Menus import Menus
 from view.Login import Login
 from view.Register import Register
 from view.ViewPartition import ViewPartition
@@ -11,54 +14,78 @@ from view.InputField import InputField
 
 from control.exceptions.EmptyFieldException import EmptyFieldException
 
-current_logged_user = None
 
-start_menu = "O que gostaria de fazer? Escolha uma das opcoes abaixo:\n" \
-             " 1 - Para Login                                        \n" \
-             " 2 - Para Registrar-se                                 \n" \
-             " 3 - Para Sair                                           "
-
-
-def outside_account():    
-    while True:
-        user_input = InputField().show(">> ")
-
-        if user_input == '1':
-            try:
-                current_logged_user = Login().show()
-                print(current_logged_user)
-                break
-            except EmptyFieldException:
-                ViewPartition().border_logo()
-                print(start_menu)
-                continue
-            
-        elif user_input == '2':
-            try:
-                current_logged_user = Register().show()
-                print(current_logged_user)
-                break
-            except EmptyFieldException:
-                ViewPartition().border_logo()
-                print(start_menu)
-                continue
-
-        elif user_input == '3':
-            ViewPartition().clear_console()
-            return True
-        else:
-            print("Resposta errada, tente novamente")
-
-def main():
-    ViewPartition().clear_console()
-
-    exit_program = False
-
-    while not exit_program:
-        ViewPartition().border_logo()
-        print(start_menu)
-        
-        exit_program = outside_account()
+class Main():
+    current_logged_user = None
     
+    def outside_account(self):
+        Menus().show_start_menu()
 
-main()
+        while True:
+            user_input = InputField().show(">> ")
+
+            if user_input == '1':
+                try:
+                    self.current_logged_user = Login().show()
+                    print(self.current_logged_user)
+                    break
+                except EmptyFieldException:
+                    Menus().show_start_menu()
+                    continue
+                
+            elif user_input == '2':
+                try:
+                    self.current_logged_user = Register().show()
+                    print(self.current_logged_user)
+                    break
+                except EmptyFieldException:
+                    Menus().show_start_menu()
+                    continue
+
+            elif user_input == '3':
+                ViewPartition().clear_console()
+                return True
+            else:
+                Menus().show_start_menu(information_message="Escolha inválida, tente novamente")
+
+
+    def inside_account(self):
+        if self.current_logged_user:
+            Menus().show_logged_menu(user_name=str(self.current_logged_user[0][0]))
+        else:
+            Menus().show_logged_menu()
+
+        while True:
+            user_input = InputField().show(">> ")
+
+            if user_input == '1':
+                continue
+            elif user_input == '2':
+                continue
+            elif user_input == '3':
+                continue
+            elif user_input == '4':
+                ViewPartition().clear_console()
+                print('busque usuário')
+                user_input = InputField().show(">> ")
+                print(Accounts().search_users(user_input))
+            elif user_input == '5':
+                ViewPartition().clear_console()
+                break
+            else:
+                Menus().show_start_menu(information_message="Escolha inválida, tente novamente")
+
+    def run(self):
+        ViewPartition().clear_console()
+
+        exit_program = False
+
+        while True:
+            exit_program = self.outside_account()
+
+            if not exit_program:
+                self.inside_account()
+            else:
+                break
+
+Main().run()
