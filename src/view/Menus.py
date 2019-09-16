@@ -5,6 +5,8 @@ sys.path.append(os.path.abspath(os.path.join('..')))
 
 from view.ViewPartition import ViewPartition
 
+from model.User import User
+
 class Menus:
     def _show_information_message(self, information_message=None):
         if information_message:
@@ -22,13 +24,13 @@ class Menus:
 
         self._show_information_message(information_message)
 
-    def show_logged_menu(self, user_name=None, information_message=None):
+    def show_logged_menu(self, user=None, information_message=None):
         ViewPartition().border_logo()
 
-        if not user_name:
-            user_name = ""
+        if not user:
+            user = User(None)
 
-        print("Bem-vindo, " + str(user_name) + "                    \n\n" \
+        print("Usuário: " + str(user.user_name) + "                 \n\n" \
               "O que gostaria de fazer? Escolha uma das opcoes abaixo:\n" \
               " 1 - Visualizar Perfil                                 \n" \
               " 2 - Ver Usuários que Segue                            \n" \

@@ -5,6 +5,7 @@ import sys
 sys.path.append(os.path.abspath(os.path.join('..')))
 
 from model.Connection import Connection
+from model.User import User
 from control.Validator import Validator
 from control.exceptions.WrongPasswordException import WrongPasswordException
 from control.exceptions.RepeatedPrimaryKeyException import RepeatedPrimaryKeyException
@@ -22,10 +23,10 @@ class Accounts:
             user_name = str(user_name)
             
             cursor.execute("select * from perfil where nome_usuario=%s", [user_name])
-            user = cursor.fetchall()
+            user_as_list = cursor.fetchall()
 
             self.connection.close_database_connection()
-            return user
+            return User(user_as_list)
 
         except ValueError:
             self.connection.close_database_connection()
@@ -47,10 +48,11 @@ class Accounts:
             password = str(password)
             
             cursor.execute("select * from perfil where nome_usuario=%s", [user_name])
-            user = cursor.fetchall()
+            user_as_list = cursor.fetchall()
+            user = User(user_as_list)
 
             # Se a senha do usuário for diferente da senha digitada no campo:
-            if user and user[0][2] != password:
+            if user.password != password:
                 raise WrongPasswordException()
 
             self.connection.close_database_connection()
@@ -73,13 +75,14 @@ class Accounts:
         cursor = self.connection.start_database_connection()
         
         try:
-            complete_name = str(complete_name)
-            user_name = str(user_name)
-            password = str(password)
-            biography = ""
-            privacy = False
-            
-            cursor.execute("select * from perfil where nome_usuario=%s", [user_name])
+            user = User(None)
+            user.complete_name = str(complete_name)
+            user.user_name = str(user_name)
+            user.password = str(password)
+            user.biography = ""
+            user.privacy = False
+
+            cursor.execute("select * from perfil where nome_usuario=%s", [user.user_name])
             
             # Se existir algum usuário com o mesmo nome de usuário, lança exceção avisando isso
             if cursor.fetchall():
@@ -87,12 +90,12 @@ class Accounts:
 
             cursor.execute(
                 "insert into perfil(nome_usuario, nome_real, senha, biografia, privacidade) values (%s, %s, %s, %s, %s)", 
-                (user_name, complete_name, password, biography, privacy)
+                (user.user_name, user.complete_name, user.password, user.biography, user.privacy)
             )
             
             self.connection.close_database_connection()
 
-            return [(user_name, complete_name, password, biography, privacy)]
+            return user
 
         except RepeatedPrimaryKeyException:
             self.connection.close_database_connection()
@@ -110,7 +113,11 @@ class Accounts:
             search_parameter = '%' + user_name_fragment + '%'
             
             cursor.execute("select * from perfil where nome_usuario like %s", [search_parameter])
-            users = cursor.fetchall()
+            users_as_list = cursor.fetchall()
+            users = []
+
+            for user_as_list in users_as_list:
+                users.append(User(user_as_list))
 
             self.connection.close_database_connection()
             return users

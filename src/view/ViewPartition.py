@@ -10,6 +10,14 @@ class ViewPartition:
         self.border_divisory()
         print("\t\t\t\tPOST-AGE")
         self.border_divisory()
+
+    def border_dialog(self, message):
+        self.border_logo()
+        print(message)
+
+    def border_information_message(self, message):
+        self.border_divisory()
+        print(message)
     
     def border_divisory(self):
         print("")

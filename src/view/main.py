@@ -5,10 +5,12 @@ import sys
 sys.path.append(os.path.abspath(os.path.join('..')))
 
 from model.Accounts import Accounts
+from model.User import User
 
 from view.Menus import Menus
 from view.Login import Login
 from view.Register import Register
+from view.Perfil import Perfil
 from view.ViewPartition import ViewPartition
 from view.InputField import InputField
 
@@ -27,8 +29,8 @@ class Main():
             if user_input == '1':
                 try:
                     self.current_logged_user = Login().show()
-                    print(self.current_logged_user)
                     break
+
                 except EmptyFieldException:
                     Menus().show_start_menu()
                     continue
@@ -36,8 +38,8 @@ class Main():
             elif user_input == '2':
                 try:
                     self.current_logged_user = Register().show()
-                    print(self.current_logged_user)
                     break
+
                 except EmptyFieldException:
                     Menus().show_start_menu()
                     continue
@@ -50,11 +52,8 @@ class Main():
 
 
     def inside_account(self):
-        if self.current_logged_user:
-            Menus().show_logged_menu(user_name=str(self.current_logged_user[0][0]))
-        else:
-            Menus().show_logged_menu()
-
+        Perfil().show(self.current_logged_user)
+        
         while True:
             user_input = InputField().show(">> ")
 
@@ -73,7 +72,7 @@ class Main():
                 ViewPartition().clear_console()
                 break
             else:
-                Menus().show_start_menu(information_message="Escolha inválida, tente novamente")
+                Menus().show_logged_menu(user_name=str(self.current_logged_user[0][0]), information_message="Escolha inválida, tente novamente")
 
     def run(self):
         ViewPartition().clear_console()

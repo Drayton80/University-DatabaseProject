@@ -15,8 +15,7 @@ from control.exceptions.RepeatedPrimaryKeyException import RepeatedPrimaryKeyExc
 
 class Register():
     def show(self):
-        ViewPartition().border_logo()
-        print("Preencha os campos de Registro (deixe-os vazio caso queira retornar ao menu)")
+        ViewPartition().border_dialog("Preencha os campos de Registro (deixe-os vazio caso queira retornar ao menu)")
         
         while True:
             try:
