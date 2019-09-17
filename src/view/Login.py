@@ -28,25 +28,20 @@ class Login():
                 user = Accounts().login_user(user_name, password)
 
                 if not user:
-                    ViewPartition().border_logo()
-                    print("Está conta não existe, tente novamente")
+                    ViewPartition().border_dialog("Está conta não existe, tente novamente")
                     continue
                 else:
                     return user
                 
             except WrongPasswordException:
-                ViewPartition().border_logo()
-                print("Senha incorreta, por favor, tente novamente")
+                ViewPartition().border_dialog("Senha incorreta, por favor, tente novamente")
 
             except EmptyFieldException as exception:
                 raise EmptyFieldException(exception.field_name)
 
             except ValueError:
-                ViewPartition().border_logo()
-                print("Alguns dos caracteres não são permitidos")
+                ViewPartition().border_dialog("Alguns dos caracteres não são permitidos")
 
             except Exception:
-                ViewPartition().border_logo()
-                traceback.print_exc()
-                print("Algo deu errado, tente novamente")
+                ViewPartition().border_dialog("Algo deu errado, tente novamente")
 

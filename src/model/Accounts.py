@@ -5,7 +5,7 @@ import sys
 sys.path.append(os.path.abspath(os.path.join('..')))
 
 from model.Connection import Connection
-from model.User import User
+from model.entities.User import User
 from control.Validator import Validator
 from control.exceptions.WrongPasswordException import WrongPasswordException
 from control.exceptions.RepeatedPrimaryKeyException import RepeatedPrimaryKeyException
@@ -49,13 +49,18 @@ class Accounts:
             
             cursor.execute("select * from perfil where nome_usuario=%s", [user_name])
             user_as_list = cursor.fetchall()
-            user = User(user_as_list)
+
+            if user_as_list:
+                user = User(user_as_list[0])
+            else:
+                user = None
 
             # Se a senha do usuário for diferente da senha digitada no campo:
-            if user.password != password:
+            if user and user.password != password:
                 raise WrongPasswordException()
 
             self.connection.close_database_connection()
+
             return user
 
         except ValueError:

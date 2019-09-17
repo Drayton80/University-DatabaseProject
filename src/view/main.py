@@ -5,7 +5,7 @@ import sys
 sys.path.append(os.path.abspath(os.path.join('..')))
 
 from model.Accounts import Accounts
-from model.User import User
+from model.entities.User import User
 
 from view.Menus import Menus
 from view.Login import Login

@@ -36,17 +36,13 @@ class Register():
                 raise EmptyFieldException(exception.field_name)
 
             except RepeatedPrimaryKeyException:
-                ViewPartition().border_logo()
-                print("Nome de Usuário já existe")
+                ViewPartition().border_dialog("Nome de Usuário já existe")
 
             except ValueError:
-                ViewPartition().border_logo()
-                print("Alguns dos caracteres não são permitidos")
+                ViewPartition().border_dialog("Alguns dos caracteres não são permitidos")
 
             except Exception:
-                ViewPartition().border_logo()
-                traceback.print_exc()
-                print("Algo deu errado, tente novamente")
+                ViewPartition().border_dialog("Algo deu errado, tente novamente")
 
         
 

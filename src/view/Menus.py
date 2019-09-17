@@ -5,7 +5,7 @@ sys.path.append(os.path.abspath(os.path.join('..')))
 
 from view.ViewPartition import ViewPartition
 
-from model.User import User
+from model.entities.User import User
 
 class Menus:
     def _show_information_message(self, information_message=None):
