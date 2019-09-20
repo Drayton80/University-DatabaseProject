@@ -18,8 +18,10 @@ from control.exceptions.EmptyFieldException import EmptyFieldException
 
 
 class Main():
-    current_logged_user = None
+    def __init__(self):
+        self.current_logged_user = None
     
+
     def outside_account(self):
         Menus().show_start_menu()
 
@@ -29,7 +31,7 @@ class Main():
             if user_input in ['login', '1']:
                 try:
                     self.current_logged_user = Login().show()
-                    break
+                    return 'home_logged_perfil'
 
                 except EmptyFieldException:
                     Menus().show_start_menu()
@@ -38,33 +40,34 @@ class Main():
             elif user_input in ['registrar', '2']:
                 try:
                     self.current_logged_user = Register().show()
-                    break
+                    return 'home_logged_perfil'
 
                 except EmptyFieldException:
                     Menus().show_start_menu()
                     continue
 
-            elif user_input in ['sair', '2']:
+            elif user_input in ['sair', '3']:
                 ViewPartition().clear_console()
-                return True
+                return 'exit'
             else:
                 Menus().show_start_menu(information_message="Escolha inválida, tente novamente")
 
 
-    def inside_account(self):        
-        Perfil(self.current_logged_user).run()           
-
     def run(self):
         ViewPartition().clear_console()
 
-        exit_program = False
+        return_command = 'outside_account'
 
         while True:
-            exit_program = self.outside_account()
+            if   return_command == 'outside_account':
+                return_command = self.outside_account()
+            
+            elif return_command == 'home_logged_perfil':
+                return_command = Perfil(self.current_logged_user).run()
 
-            if not exit_program:
-                self.inside_account()
-            else:
+            elif return_command == 'exit':
                 break
 
 Main().run()
+
+# main (loop) -> Perfil (loop) -> Search -> Perfil (loop)

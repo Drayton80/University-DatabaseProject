@@ -14,11 +14,16 @@ class Perfil:
             self.logged_user = logged_user
 
       def run(self):
-            exit_account = False
-
-            while not exit_account:
+            while True:
                   selected_option = self.show(self.logged_user)
-                  exit_account = self.selection(selected_option, self.logged_user)
+                  return_command = self.selection(selected_option, self.logged_user)
+
+                  if   return_command == 'home_logged_perfil':
+                        return 'home_logged_perfil'
+
+                  elif return_command == 'outside_account':
+                        return 'outside_account'
+                  
 
       def show(self, perfil_user, information_message=None):
             ViewPartition().border_logo()
@@ -80,8 +85,16 @@ class Perfil:
                   return False
 
             elif perfil_belongs_to_logged_user and selected_option in ['D']:
-                  ViewPartition().clear_console()
-                  return True
+                  return 'outside_account'
+
+            elif not perfil_belongs_to_logged_user and selected_option in ['S']:
+                  pass
+
+            elif not perfil_belongs_to_logged_user and selected_option in ['B']:
+                  pass
+
+            elif not perfil_belongs_to_logged_user and selected_option in ['R']:
+                  return 'home_logged_perfil'
 
             else:
                   self.show(perfil_user, information_message="Escolha inválida, tente novamente")

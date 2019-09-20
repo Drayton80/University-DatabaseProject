@@ -10,6 +10,6 @@ class InputField:
         if show_divisory:
             ViewPartition().border_divisory()
 
-        user_input = input(left_text)
+        user_input = input(left_text if left_text.endswith(' ') else left_text + ' ')
 
         return user_input
