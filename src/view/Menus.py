@@ -17,10 +17,10 @@ class Menus:
     def show_start_menu(self, information_message=None):
         ViewPartition().border_logo()
 
-        print("O que gostaria de fazer? Escolha uma das opcoes abaixo:\n" \
-              " 1 - Para Login                                        \n" \
-              " 2 - Para Registrar-se                                 \n" \
-              " 3 - Para Sair                                           " )
+        print("O que gostaria de fazer? Digite uma das opcoes abaixo:\n" \
+              " 1 - Para Login                               \n" \
+              " 2 - Para Registrar-se                        \n" \
+              " 3 - Para Sair                                  " )
 
         self._show_information_message(information_message)
 

@@ -24,9 +24,9 @@ class Main():
         Menus().show_start_menu()
 
         while True:
-            user_input = InputField().show(">> ")
+            user_input = InputField().show(">> ").lower()
 
-            if user_input == '1':
+            if user_input in ['login', '1']:
                 try:
                     self.current_logged_user = Login().show()
                     break
@@ -35,7 +35,7 @@ class Main():
                     Menus().show_start_menu()
                     continue
                 
-            elif user_input == '2':
+            elif user_input in ['registrar', '2']:
                 try:
                     self.current_logged_user = Register().show()
                     break
@@ -44,35 +44,15 @@ class Main():
                     Menus().show_start_menu()
                     continue
 
-            elif user_input == '3':
+            elif user_input in ['sair', '2']:
                 ViewPartition().clear_console()
                 return True
             else:
                 Menus().show_start_menu(information_message="Escolha inválida, tente novamente")
 
 
-    def inside_account(self):
-        Perfil().show(self.current_logged_user)
-        
-        while True:
-            user_input = InputField().show(">> ")
-
-            if user_input == '1':
-                continue
-            elif user_input == '2':
-                continue
-            elif user_input == '3':
-                continue
-            elif user_input == '4':
-                ViewPartition().clear_console()
-                print('busque usuário')
-                user_input = InputField().show(">> ")
-                print(Accounts().search_users(user_input))
-            elif user_input == '5':
-                ViewPartition().clear_console()
-                break
-            else:
-                Menus().show_logged_menu(user_name=str(self.current_logged_user[0][0]), information_message="Escolha inválida, tente novamente")
+    def inside_account(self):        
+        Perfil(self.current_logged_user).run()           
 
     def run(self):
         ViewPartition().clear_console()

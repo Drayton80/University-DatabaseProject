@@ -16,8 +16,9 @@ class ViewPartition:
         print(message)
 
     def border_information_message(self, message):
-        self.border_divisory()
-        print(message)
+        if message:
+            self.border_divisory()
+            print(message)
     
     def border_divisory(self):
         print("")

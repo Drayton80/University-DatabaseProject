@@ -12,6 +12,7 @@ from model.Accounts import Accounts
 from control.Validator import Validator
 from control.exceptions.EmptyFieldException import EmptyFieldException
 from control.exceptions.RepeatedPrimaryKeyException import RepeatedPrimaryKeyException
+from control.exceptions.InvalidUsernameException import InvalidUsernameException
 
 class Register():
     def show(self):
@@ -24,6 +25,7 @@ class Register():
 
                 user_name = InputField().show("Nome de Usuário> ", show_divisory=False)
                 user_name = Validator().validate_empty_field(user_name, "Nome de Usuário")
+                user_name = Validator().validate_user_name_characters(user_name)
 
                 password  = InputField().show("Senha> ", show_divisory=False)
                 password  = Validator().validate_empty_field(password, "Senha")
@@ -37,6 +39,9 @@ class Register():
 
             except RepeatedPrimaryKeyException:
                 ViewPartition().border_dialog("Nome de Usuário já existe")
+
+            except InvalidUsernameException as e:
+                ViewPartition().border_dialog("O nome de usuário apenas pode conter letras, números e o underline")
 
             except ValueError:
                 ViewPartition().border_dialog("Alguns dos caracteres não são permitidos")
