@@ -10,10 +10,7 @@ from view.InputField import InputField
 from view.ViewPartition import ViewPartition
 
 
-class SearchUser:
-    def __init__(self, logged_user):
-        self.logged_user = logged_user
-
+class Search:
     def _is_empty_field(self, field_value):
         if field_value.isspace() or field_value in [None, '']:
             return True
@@ -26,6 +23,11 @@ class SearchUser:
         else:
             return True
 
+
+class SearchUser(Search):
+    def __init__(self, logged_user):
+        self.logged_user = logged_user
+    
     def run(self):
         search_key = self.show()
 

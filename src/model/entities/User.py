@@ -1,12 +1,11 @@
 import psycopg2
 import os
 import sys
+import traceback
 
 sys.path.append(os.path.abspath(os.path.join('../..')))
 
 from model.Connection import Connection
-from model.relationships.Follow import Follow
-
 
 class User:
     def __init__(self, user_as_list):
@@ -20,9 +19,66 @@ class User:
     def __str__(self):
         user_name = str(self.user_name)
         privacy = 'Privado' if self.privacy else 'Público'
-        follower_number = str(len(Follow().get_user_followers(self)))
+        #follower_number = str(len(self.get_user_followers()))
 
         return user_name + ' (Perfil ' + privacy + ')'
+    
+    def set_privacy(self, privacy: bool):
+        connection = Connection()
+        cursor = connection.start_database_connection()
+
+        self.privacy = privacy
+
+        cursor.execute(
+            "update perfil set privacidade=%s where nome_usuario=%s",
+            (privacy, self.user_name)
+        )
+
+        connection.close_database_connection()
+    
+    def get_user_followers(self):
+        connection = Connection()
+        cursor = connection.start_database_connection()
+
+        user_name = str(self.user_name)
+        
+        cursor.execute(
+            "select nome_usuario, nome_real, senha, biografia, privacidade" \
+            " from seguimento inner join perfil on seguimento.nome_seguidor = perfil.nome_usuario " \
+            " where nome_seguido=%s and confirmacao=%s", 
+            (user_name, True))
+            
+        followers_as_list = cursor.fetchall()
+        followers = []
+
+        for follower_as_list in followers_as_list:
+            followers.append(User(follower_as_list))
+
+        connection.close_database_connection()
+        
+        return followers
+
+    def get_user_followeds(self):
+        connection = Connection()
+        cursor = connection.start_database_connection()
+
+        user_name = str(self.user_name)
+        
+        cursor.execute(
+            "select nome_usuario, nome_real, senha, biografia, privacidade" \
+            " from seguimento inner join perfil on seguimento.nome_seguido = perfil.nome_usuario " \
+            " where nome_seguidor=%s and confirmacao=%s",
+            (user_name, True))
+            
+        followeds_as_list = cursor.fetchall()
+        followeds = []
+
+        for followed_as_list in followeds_as_list:
+            followeds.append(User(followed_as_list))
+
+        connection.close_database_connection()
+        
+        return followeds
 
     @classmethod
     def search_users(cls, search_key, order_by=None):
@@ -48,7 +104,7 @@ class User:
 
             if order_by_followers:
                 for user_information in all_users_informations:
-                    user_information['followers number'] = len(Follow().get_user_followers(user_information['object']))
+                    user_information['followers number'] = len(user_information['object'].get_user_followers())
 
                 all_users_informations = sorted(all_users_informations, key= lambda k: k['followers number'], reverse=True)
 
@@ -61,7 +117,8 @@ class User:
             connection.close_database_connection()
             raise ValueError
 
-        except Exception:
+        except Exception as e:
             connection.close_database_connection()
+            traceback.print_exc()
             raise Exception
 

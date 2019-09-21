@@ -65,8 +65,12 @@ class Perfil:
 
             perfil_belongs_to_logged_user = True if self.logged_user.user_name == perfil_user.user_name else False
 
-            if  perfil_belongs_to_logged_user:
+            if perfil_belongs_to_logged_user:
                   print("Bem-vindo,", perfil_user.user_name)
+                  ViewPartition().border_divisory()
+            elif Follow().follow_exist(perfil_user, self.logged_user) and (
+                 Follow().get_follow_instance(self.logged_user, perfil_user).confirmation == True):
+                  print("@" + perfil_user.user_name + " segue você")
                   ViewPartition().border_divisory()
 
             privacy_status = 'Privado' if perfil_user.privacy else 'Público'
@@ -80,22 +84,33 @@ class Perfil:
             
             print("O que gostaria de fazer? Digite uma das opcoes abaixo:")
             
-            # TODO checar se o usuário é seguidor do perfil_user para ver se isso será exibido:
-            if not perfil_user.privacy or (perfil_user.privacy and True):
+            if perfil_belongs_to_logged_user or not perfil_user.privacy or (
+               Follow().follow_exist(self.logged_user, perfil_user) and Follow().get_follow_instance(self.logged_user, perfil_user).confirmation):
                   print(" 1 - Ver Postagens         \n" \
                         " 2 - Ver Seguidores        \n" \
-                        " 3 - Ver Aqueles que Segue   " )
+                        " 3 - Ver Aqueles que Segue \n" \
+                        " 4 - Buscar Perfil         \n" \
+                        " 5 - Buscar Tópico           " ) 
+
             
             if perfil_belongs_to_logged_user:
-                  options_search      = " 4 - Buscar Perfil     \n" \
-                                        " 5 - Buscar Tópico     \n" 
-                  option_notificacoes = " N - Para Notificações \n"
-                  option_deslogar     = " D - Para sair da Conta  "
-                  extra_options = options_search + option_notificacoes + option_deslogar
+                  option_nova_postagem = " C - Para Criar uma Nova Postagem  \n"
+                  option_notificacoes  = " N - Para Notificações             \n"
+                  option_privacidade   = " P - Para tornar seu Perfil Privado\n" if not self.logged_user.privacy else " P - Para tornar seu Perfil Público\n"
+                  option_deslogar      = " D - Para sair da Conta              "
+
+                  extra_options = option_nova_postagem + option_notificacoes + option_privacidade + option_deslogar
             else:
-                  option_seguir   = ' S - Para deixar de Seguir\n'if Follow().follow_exist(self.logged_user, perfil_user) else ' S - Para Seguir\n' 
+                  if Follow().follow_exist(self.logged_user, perfil_user):
+                        follow = Follow().get_follow_instance(self.logged_user, perfil_user)
+                        
+                        option_seguir = '' if follow.confirmation == False else ' S - Para deixar de Seguir\n'
+                  else:
+                        option_seguir   = ' S - Para Seguir\n' 
+                  
                   option_bloquear = ' B - Para Bloquear\n' 
                   option_retornar = ' R - Para retornar para seu Perfil' 
+                  
                   extra_options = option_seguir + option_bloquear + option_retornar
 
             print(extra_options)
@@ -104,10 +119,12 @@ class Perfil:
 
             return InputField().show('>>')
             
-      def _show_followers_list(self, followers_list):
+      def _show_follow_list(self, follow_list, follow_type='followers'):
             ViewPartition().border_logo()
 
-            List(followers_list, if_list_is_empty_message='Não há Seguidores para serem exibidos').run()
+            emtpy_message_subject = 'Seguidores' if follow_type == 'followers' else 'Usuário que está Seguindo'
+
+            List(follow_list, if_list_is_empty_message='Não há ' + emtpy_message_subject + ' para serem exibidos').run()
 
             ViewPartition().border_divisory()
 
@@ -115,6 +132,7 @@ class Perfil:
             print('Para retornar basta manter o campo vazio e pressionar Enter')
 
             return InputField().show('>>')
+            
 
       def selection(self, selected_option, perfil_user):
             if not perfil_user:
@@ -127,18 +145,26 @@ class Perfil:
                   pass
 
             elif selected_option in ['2']:
-                  followers_list = Follow().get_user_followers(perfil_user)
-                  selected_user_index = self._show_followers_list(followers_list)
+                  followers_list = perfil_user.get_user_followers()
+                  selected_user_index = self._show_follow_list(followers_list, follow_type='followers')
 
-                  if self._empty_field(selected_user_index):
+                  if self._empty_field(selected_user_index) or not (isinstance(selected_user_index, str) and selected_user_index.isdigit()):
                         return {'command': 'show_another_perfil', 'object': perfil_user}
                   elif not self._is_out_of_bounds(selected_user_index, len(followers_list)):
-                        return {'command': 'show_another_perfil', 'object': followers_list[selected_user_index-1]}
+                        return {'command': 'show_another_perfil', 'object': followers_list[int(selected_user_index)-1]}
                   else:
                         return {'command': 'show_another_perfil', 'object': perfil_user}
 
             elif selected_option in ['3']:
-                  pass
+                  followeds_list = perfil_user.get_user_followeds()
+                  selected_user_index = self._show_follow_list(followeds_list, follow_type='followeds')
+
+                  if self._empty_field(selected_user_index) or not (isinstance(selected_user_index, str) and selected_user_index.isdigit()):
+                        return {'command': 'show_another_perfil', 'object': perfil_user}
+                  elif not self._is_out_of_bounds(selected_user_index, len(followeds_list)):
+                        return {'command': 'show_another_perfil', 'object': followeds_list[int(selected_user_index)-1]}
+                  else:
+                        return {'command': 'show_another_perfil', 'object': perfil_user}
 
             elif selected_option in ['4']:
                   user_selected_on_search = SearchUser(self.logged_user).run()
@@ -148,13 +174,27 @@ class Perfil:
             elif selected_option in ['5']:
                   pass
 
-            elif perfil_belongs_to_logged_user and selected_option.upper in ['N']:
+            elif perfil_belongs_to_logged_user and selected_option in ['C']:
                   pass
+            
+            elif perfil_belongs_to_logged_user and selected_option in ['N']:
+                  pass
+
+            elif perfil_belongs_to_logged_user and selected_option in ['P']:
+                  # Inverte o status de privacidade:
+                  privacy_change = False if self.logged_user.privacy == True else True
+                  self.logged_user.set_privacy(privacy_change)
+
+                  return {'command': 'home_logged_perfil', 'object': None} 
 
             elif perfil_belongs_to_logged_user and selected_option in ['D']:
                   return {'command': 'outside_account', 'object': None} 
 
             elif not perfil_belongs_to_logged_user and selected_option in ['S']:
+                  if Follow().follow_exist(self.logged_user, perfil_user) and (
+                     Follow().get_follow_instance(self.logged_user, perfil_user).confirmation == False):
+                        return {'command': 'wrong_selection', 'object': perfil_user, 'information message': 'Escolha inválida, tente novamente'}
+
                   if Follow().follow_exist(self.logged_user, perfil_user):
                         Follow().delete_instance(self.logged_user, perfil_user)
                   else:
