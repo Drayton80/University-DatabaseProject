@@ -15,7 +15,7 @@ class Validator:
             return field_value
 
     def validate_user_name_characters(self, user_name):
-        search = re.compile(r'[^a-z0-9_]').search
+        search = re.compile(r'[^a-zA-Z0-9_]').search
 
         if bool(search(user_name)):
             raise InvalidUsernameException()
