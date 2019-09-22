@@ -1,4 +1,6 @@
-class List:
+from view.View import View
+
+class List(View):
     def __init__(self, entities_list, if_list_is_empty_message=None):
         self.entities_list = entities_list
         self.if_list_is_empty_message = if_list_is_empty_message

@@ -6,6 +6,7 @@ import traceback
 sys.path.append(os.path.abspath(os.path.join('../..')))
 
 from model.Connection import Connection
+from model.entities.Post import Post
 
 class User:
     def __init__(self, user_as_list):
@@ -79,6 +80,25 @@ class User:
         connection.close_database_connection()
         
         return followeds
+
+    def get_user_posts(self):
+        connection = Connection()
+        cursor = connection.start_database_connection()
+
+        cursor.execute(
+            "select * from postagem where id_autor=%s",
+            [self.user_name]
+        )
+
+        posts_as_lists = cursor.fetchall()
+        posts = []
+
+        for post_as_list in posts_as_lists:
+            posts.append(Post(post_as_list))
+
+        connection.close_database_connection()
+
+        return posts
 
     @classmethod
     def search_users(cls, search_key, order_by=None):

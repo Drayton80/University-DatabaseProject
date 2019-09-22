@@ -6,27 +6,29 @@ sys.path.append(os.path.abspath(os.path.join('..')))
 from model.relationships.Follow import Follow
 from model.entities.User import User
 
+from view.View import UserView
 from view.InputField import InputField
 from view.ViewPartition import ViewPartition
 from view.Menus import Menus
 from view.List import List
 from view.Search import SearchUser
+from view.Create import PostCreate
+from view.Post import Post
 
-class Perfil:
-      def __init__(self, logged_user):
-            self.logged_user = logged_user
+class Perfil(UserView):
+      def _show_follow_list(self, follow_list, follow_type='followers'):
+            ViewPartition().border_logo()
 
-      def _empty_field(self, field_value):
-        if field_value.isspace() or field_value in [None, '']:
-            return True
-        else:
-            return False
+            emtpy_message_subject = 'Seguidores' if follow_type == 'followers' else 'Usuários que está Seguindo'
 
-      def _is_out_of_bounds(self, index, upper_limit):
-        if index.isdigit() and 0 <= int(index)-1 < upper_limit:
-            return False
-        else:
-            return True
+            List(follow_list, if_list_is_empty_message='Não há ' + emtpy_message_subject + ' para serem exibidos').run()
+
+            ViewPartition().border_divisory()
+
+            print('Caso deseje visualizar algum usuário, selecione ele pelo número ao lado')
+            print('Para retornar basta manter o campo vazio e pressionar Enter')
+
+            return InputField().show('>>')
 
       def run(self):
             selected_option = self.show(self.logged_user)
@@ -119,20 +121,6 @@ class Perfil:
 
             return InputField().show('>>')
             
-      def _show_follow_list(self, follow_list, follow_type='followers'):
-            ViewPartition().border_logo()
-
-            emtpy_message_subject = 'Seguidores' if follow_type == 'followers' else 'Usuário que está Seguindo'
-
-            List(follow_list, if_list_is_empty_message='Não há ' + emtpy_message_subject + ' para serem exibidos').run()
-
-            ViewPartition().border_divisory()
-
-            print('Caso deseje visualizar algum usuário, selecione ele pelo número ao lado')
-            print('Para retornar basta manter o campo vazio e pressionar Enter')
-
-            return InputField().show('>>')
-            
 
       def selection(self, selected_option, perfil_user):
             if not perfil_user:
@@ -142,13 +130,13 @@ class Perfil:
             selected_option = selected_option.upper()
             
             if   selected_option in ['1']:
-                  pass
+                  Post(self.logged_user, perfil_user).run()
 
             elif selected_option in ['2']:
                   followers_list = perfil_user.get_user_followers()
                   selected_user_index = self._show_follow_list(followers_list, follow_type='followers')
 
-                  if self._empty_field(selected_user_index) or not (isinstance(selected_user_index, str) and selected_user_index.isdigit()):
+                  if self._is_empty_field(selected_user_index) or not (isinstance(selected_user_index, str) and selected_user_index.isdigit()):
                         return {'command': 'show_another_perfil', 'object': perfil_user}
                   elif not self._is_out_of_bounds(selected_user_index, len(followers_list)):
                         return {'command': 'show_another_perfil', 'object': followers_list[int(selected_user_index)-1]}
@@ -159,7 +147,7 @@ class Perfil:
                   followeds_list = perfil_user.get_user_followeds()
                   selected_user_index = self._show_follow_list(followeds_list, follow_type='followeds')
 
-                  if self._empty_field(selected_user_index) or not (isinstance(selected_user_index, str) and selected_user_index.isdigit()):
+                  if self._is_empty_field(selected_user_index) or not (isinstance(selected_user_index, str) and selected_user_index.isdigit()):
                         return {'command': 'show_another_perfil', 'object': perfil_user}
                   elif not self._is_out_of_bounds(selected_user_index, len(followeds_list)):
                         return {'command': 'show_another_perfil', 'object': followeds_list[int(selected_user_index)-1]}
@@ -175,7 +163,7 @@ class Perfil:
                   pass
 
             elif perfil_belongs_to_logged_user and selected_option in ['C']:
-                  pass
+                  PostCreate(self.logged_user).run()
             
             elif perfil_belongs_to_logged_user and selected_option in ['N']:
                   pass
