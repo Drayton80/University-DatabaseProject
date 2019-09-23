@@ -8,6 +8,7 @@ from model.entities.Commentary import Commentary
 from view.View import UserView
 from view.InputField import InputField
 from view.ViewPartition import ViewPartition
+from view.Create import CommentaryCreate
 from view.List import List
 from view.Dialog import Dialog
 
@@ -21,19 +22,20 @@ class CommentaryView(UserView):
                 return None
 
             elif isinstance(selected_commentary_index, str) and selected_commentary_index.upper() == 'C':
-                # TODO exibir tela de criar comentário
-                break
+                CommentaryCreate(self.logged_user, displayed_user=self.displayed_user, displayed_post=self.displayed_post).run()
+                displayed_post_commentaries = self.displayed_post.get_post_commentaries()
+                selected_commentary_index = self._filter_selected_index(self._show_commentary_list(displayed_post_commentaries))
             
             elif self._is_value_a_number(selected_commentary_index) and ( 
                 not self._is_out_of_bounds(selected_commentary_index, len(displayed_post_commentaries))):
                 selected_option = self._show_selected_commentary(displayed_post_commentaries[selected_commentary_index])
                 
                 while True:
-                    if selected_option == 'R':
+                    if selected_option == 'R' or self._is_empty_field(selected_option):
                         break
-                    elif self._commentary_belongs_to_logged_user(displayed_post_commentaries[selected_commentary_index]) and selected_option == '1':
+                    elif self._post_belongs_to_logged_user() and selected_option == '1':
                         Commentary.delete_instance(displayed_post_commentaries[selected_commentary_index].commentary_id)
-                        displayed_post_commentaries = self.displayed_post.get_user_commentaries()
+                        displayed_post_commentaries = self.displayed_post.get_post_commentaries()
                         break
                     else:
                         selected_option = self._show_selected_commentary(displayed_post_commentaries[selected_commentary_index], information_message='Escolha Inválida')
@@ -50,13 +52,15 @@ class CommentaryView(UserView):
         if_list_is_empty_message = 'Este Post não possui Comentários'
 
         if commentary_list:
-            print("Todos os Comentários:")
+            print("Todos os Comentários:\n")
 
-        List(commentary_list, if_list_is_empty_message=if_list_is_empty_message, separator='\n').run()
+        List(commentary_list, 
+            if_list_is_empty_message=if_list_is_empty_message, 
+            separator='\n', index_left_list_element=False, word_before_index='Comentário ').run()
 
         ViewPartition().border_divisory()
                
-        print('Caso deseje visualizar algum comentário, selecione ele pelo número ao lado')
+        print('Caso deseje visualizar algum comentário, selecione ele pelo número ao acima dele')
         print('Caso deseje escrever um novo comentário digite \'C\' e pressione Enter')
         print("(Caso deseje retornar, deixe o campo em branco)")
 
@@ -73,14 +77,11 @@ class CommentaryView(UserView):
 
         print("O que gostaria de fazer? Digite uma das opcoes abaixo:")
         
-        if self._commentary_belongs_to_logged_user(commentary):
-            print(" 1 - Deletar esse Post")
+        if self._post_belongs_to_logged_user():
+            print(" 1 - Deletar esse Comentário")
 
-        print(" R - Retornar para Lista de Posts")
+        print(" R - Retornar para Lista de Comentários")
 
         ViewPartition().border_information_message(information_message)
 
         return self._filter_selected_value(InputField().show('>>'))       
-
-    def _commentary_belongs_to_logged_user(self, commentary):
-        return True if self.logged_user.user_name == commentary.author_id else False

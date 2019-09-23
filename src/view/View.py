@@ -41,3 +41,6 @@ class UserView(View):
 
     def _displayed_user_is_logged_user(self):
         return True if self.logged_user == self.displayed_user else False
+
+    def _post_belongs_to_logged_user(self):
+        return True if self.logged_user.user_name == self.displayed_post.author_id else False

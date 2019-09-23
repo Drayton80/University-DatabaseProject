@@ -71,7 +71,7 @@ class Perfil(UserView):
                   print("Bem-vindo,", perfil_user.user_name)
                   ViewPartition().border_divisory()
             elif Follow().follow_exist(perfil_user, self.logged_user) and (
-                 Follow().get_follow_instance(self.logged_user, perfil_user).confirmation == True):
+                 Follow().get_follow_instance(perfil_user, self.logged_user).confirmation == True):
                   print("@" + perfil_user.user_name + " segue você")
                   ViewPartition().border_divisory()
 
@@ -88,7 +88,7 @@ class Perfil(UserView):
             
             if perfil_belongs_to_logged_user or not perfil_user.privacy or (
                Follow().follow_exist(self.logged_user, perfil_user) and Follow().get_follow_instance(self.logged_user, perfil_user).confirmation):
-                  print(" 1 - Ver Postagens         \n" \
+                  print(" 1 - Ver Linha do Tempo    \n" \
                         " 2 - Ver Seguidores        \n" \
                         " 3 - Ver Aqueles que Segue \n" \
                         " 4 - Buscar Perfil         \n" \

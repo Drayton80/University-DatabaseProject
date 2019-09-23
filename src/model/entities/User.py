@@ -87,7 +87,10 @@ class User:
         cursor = connection.start_database_connection()
 
         cursor.execute(
-            "select * from postagem where id_autor=%s",
+            "select postagem.id, data, texto, foto, id_autor from postagem" \
+            " left join seguimento on postagem.id_autor = seguimento.nome_seguido" \
+            " where id_autor=%s or id_autor=seguimento.nome_seguido" \
+            " order by data desc",
             [self.user_name]
         )
 

@@ -3,6 +3,7 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.join('..')))
 
+from model.entities.Commentary import Commentary
 from model.entities.Post import Post
 from model.entities.Topic import Topic
 
@@ -44,5 +45,24 @@ class PostCreate(UserView):
             return None
         
         post = Post.create_instance(text, image_path, self.logged_user)
+
+
+class CommentaryCreate(UserView):
+    def run(self):
+        self.show()
+
+    def show(self, information_message=None):
+        ViewPartition().border_logo()
+        
+        if self.displayed_post:
+            print(self.displayed_post)
+            ViewPartition().border_divisory()
+
+        text = InputField().show('Texto do Comentário>>', show_divisory=False)
+
+        if self._is_empty_field(text):
+            return None
+        else:
+            Commentary.create_instance(self.displayed_post, text, self.logged_user)
 
         

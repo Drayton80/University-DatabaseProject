@@ -26,7 +26,7 @@ class Commentary:
         else:
             text = ''
 
-        return '@' + self.author_id + ' (' + str(self.date) + ')' + ': ' + '\n' + text
+        return ' @' + self.author_id + ' (' + str(self.date) + ')' + ': ' + '\n   ' + text
         
 
     def _create_markups_from_this_commentary(self):
@@ -65,7 +65,7 @@ class Commentary:
             if '#' in word:
                 word = re.sub('[^0-9a-zA-Z]+', '', word)
 
-                date = datetime.date.today()
+                date = datetime.datetime.now()
 
                 if not Topic.topic_exist(word):
                     cursor.execute(
@@ -80,7 +80,7 @@ class Commentary:
     
     @classmethod
     def _date_correct_format(cls, date):
-        if isinstance(date, datetime.date):
+        if isinstance(date, datetime.datetime):
             return str(date.day) + '/' + str(date.month) + '/' + str(date.year)
         else:
             return date
@@ -115,7 +115,7 @@ class Commentary:
         connection = Connection()
         cursor = connection.start_database_connection()
 
-        date = datetime.date.today()
+        date = datetime.datetime.now()
 
         cursor.execute(
             "insert into comentario(id_postagem, id_autor, data, texto) values (%s, %s, %s, %s) returning id",

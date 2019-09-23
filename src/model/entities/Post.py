@@ -3,6 +3,7 @@ import psycopg2
 import re
 import os
 import sys
+from PIL import Image
 from io import BytesIO
 
 sys.path.append(os.path.abspath(os.path.join('../..')))
@@ -36,7 +37,8 @@ class Post:
         cursor = connection.start_database_connection()
 
         cursor.execute(
-            "select * from comentario where id_postagem=%s",
+            "select * from comentario where id_postagem=%s" \
+            " order by data desc",
             [self.post_id]
         )
 
@@ -86,7 +88,7 @@ class Post:
             if '#' in word:
                 word = re.sub('[^0-9a-zA-Z]+', '', word)
 
-                date = datetime.date.today()
+                date = datetime.datetime.now()
 
                 if not Topic.topic_exist(word):
                     cursor.execute(
@@ -147,7 +149,7 @@ class Post:
         connection = Connection()
         cursor = connection.start_database_connection()
 
-        date = datetime.date.today()
+        date = datetime.datetime.now()
         image_bytes = cls._image_bytes_from_path(image_path)
 
         cursor.execute(

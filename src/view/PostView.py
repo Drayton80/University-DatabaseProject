@@ -16,6 +16,8 @@ class PostView(UserView):
     def run(self):
         displayed_user_posts = self.displayed_user.get_user_posts()
         selected_post_index = self._filter_selected_index(self._show_post_list(displayed_user_posts))
+        if not self._is_empty_field(selected_post_index):
+            self.displayed_post = displayed_user_posts[selected_post_index]
         
         while True:
             if self._is_empty_field(selected_post_index):
@@ -23,24 +25,28 @@ class PostView(UserView):
             
             elif self._is_value_a_number(selected_post_index) and ( 
                 not self._is_out_of_bounds(selected_post_index, len(displayed_user_posts))):
-                selected_option = self._show_selected_post(displayed_user_posts[selected_post_index])
+                selected_option = self._show_selected_post(self.displayed_post)
                 
                 while True:
-                    if selected_option == 'R':
+                    if selected_option == 'R' or self._is_empty_field(selected_option):
                         break
                     elif selected_option == '1':
-                        CommentaryView(self.logged_user, displayed_user=self.displayed_user, displayed_post=displayed_user_posts[selected_post_index]).run()
-                        selected_option = self._show_selected_post(displayed_user_posts[selected_post_index])
-                    elif self._displayed_user_is_logged_user()     and selected_option == '2':
-                        Post.delete_instance(displayed_user_posts[selected_post_index].post_id)
+                        CommentaryView(self.logged_user, displayed_post=self.displayed_post).run()
+                        selected_option = self._show_selected_post(self.displayed_post)
+                    elif self._post_belongs_to_logged_user() and selected_option == '2':
+                        Post.delete_instance(self.displayed_post.post_id)
                         displayed_user_posts = self.displayed_user.get_user_posts()
                         break
                     else:
-                        selected_option = self._show_selected_post(displayed_user_posts[selected_post_index], information_message='Escolha Inválida')
+                        selected_option = self._show_selected_post(self.displayed_post, information_message='Escolha Inválida')
 
                 selected_post_index = self._filter_selected_index(self._show_post_list(displayed_user_posts))
+                if not self._is_empty_field(selected_post_index):
+                    self.displayed_post = displayed_user_posts[selected_post_index]
             else:
                 selected_post_index = self._filter_selected_index(self._show_post_list(displayed_user_posts , information_message='Escolha Inválida'))
+                if not self._is_empty_field(selected_post_index):
+                    self.displayed_post = displayed_user_posts[selected_post_index]
                        
     def _show_post_list(self, post_list, information_message=None):
         ViewPartition().border_logo()
@@ -75,7 +81,7 @@ class PostView(UserView):
         print("O que gostaria de fazer? Digite uma das opcoes abaixo:")
         print(" 1 - Ver Comentários")
         
-        if self._displayed_user_is_logged_user():
+        if self._post_belongs_to_logged_user():
             print(" 2 - Deletar esse Post")
 
         print(" R - Retornar para Lista de Posts")
