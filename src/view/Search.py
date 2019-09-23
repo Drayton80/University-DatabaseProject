@@ -23,12 +23,12 @@ class SearchUser(UserView):
         wrong_selection_message = None
 
         while(True):
-            selected_index = self.show(users_list=users_list, information_message=wrong_selection_message)
+            selected_index = self._filter_selected_index(self.show(users_list=users_list, information_message=wrong_selection_message))
 
             if self._is_empty_field(selected_index):
                 return None
             elif not self._is_out_of_bounds(selected_index, len(users_list)):
-                return users_list[int(selected_index)-1] 
+                return users_list[selected_index] 
             else:
                 wrong_selection_message = 'Opção inválida'     
 

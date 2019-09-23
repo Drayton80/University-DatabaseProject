@@ -7,6 +7,7 @@ sys.path.append(os.path.abspath(os.path.join('../..')))
 
 from model.Connection import Connection
 from model.entities.Post import Post
+from model.entities.Commentary import Commentary
 
 class User:
     def __init__(self, user_as_list):
@@ -99,6 +100,25 @@ class User:
         connection.close_database_connection()
 
         return posts
+
+    def get_user_commentaries(self):
+        connection = Connection()
+        cursor = connection.start_database_connection()
+
+        cursor.execute(
+            "select * from comentario where id_autor=%s",
+            [self.user_name]
+        )
+
+        commentaries_as_lists = cursor.fetchall()
+        commentaries = []
+
+        for commentary_as_list in commentaries_as_lists:
+            commentaries.append(Commentary(commentary_as_list))
+
+        connection.close_database_connection()
+
+        return commentaries
 
     @classmethod
     def search_users(cls, search_key, order_by=None):

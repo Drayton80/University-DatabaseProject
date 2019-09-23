@@ -13,7 +13,7 @@ from view.Menus import Menus
 from view.List import List
 from view.Search import SearchUser
 from view.Create import PostCreate
-from view.Post import Post
+from view.PostView import PostView
 
 class Perfil(UserView):
       def _show_follow_list(self, follow_list, follow_type='followers'):
@@ -130,27 +130,27 @@ class Perfil(UserView):
             selected_option = selected_option.upper()
             
             if   selected_option in ['1']:
-                  Post(self.logged_user, perfil_user).run()
+                  PostView(self.logged_user, perfil_user).run()
 
             elif selected_option in ['2']:
                   followers_list = perfil_user.get_user_followers()
-                  selected_user_index = self._show_follow_list(followers_list, follow_type='followers')
+                  selected_user_index = self._filter_selected_index(self._show_follow_list(followers_list, follow_type='followers'))
 
-                  if self._is_empty_field(selected_user_index) or not (isinstance(selected_user_index, str) and selected_user_index.isdigit()):
+                  if self._is_empty_field(selected_user_index):
                         return {'command': 'show_another_perfil', 'object': perfil_user}
                   elif not self._is_out_of_bounds(selected_user_index, len(followers_list)):
-                        return {'command': 'show_another_perfil', 'object': followers_list[int(selected_user_index)-1]}
+                        return {'command': 'show_another_perfil', 'object': followers_list[int(selected_user_index)]}
                   else:
                         return {'command': 'show_another_perfil', 'object': perfil_user}
 
             elif selected_option in ['3']:
                   followeds_list = perfil_user.get_user_followeds()
-                  selected_user_index = self._show_follow_list(followeds_list, follow_type='followeds')
+                  selected_user_index = self._filter_selected_index(self._show_follow_list(followeds_list, follow_type='followeds'))
 
-                  if self._is_empty_field(selected_user_index) or not (isinstance(selected_user_index, str) and selected_user_index.isdigit()):
+                  if self._is_empty_field(selected_user_index):
                         return {'command': 'show_another_perfil', 'object': perfil_user}
                   elif not self._is_out_of_bounds(selected_user_index, len(followeds_list)):
-                        return {'command': 'show_another_perfil', 'object': followeds_list[int(selected_user_index)-1]}
+                        return {'command': 'show_another_perfil', 'object': followeds_list[selected_user_index]}
                   else:
                         return {'command': 'show_another_perfil', 'object': perfil_user}
 

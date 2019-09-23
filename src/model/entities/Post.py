@@ -3,13 +3,13 @@ import psycopg2
 import re
 import os
 import sys
-from PIL import Image
 from io import BytesIO
 
 sys.path.append(os.path.abspath(os.path.join('../..')))
 
 from model.Connection import Connection
 from model.entities.Topic import Topic
+from model.entities.Commentary import Commentary
 
 
 class Post:
@@ -30,7 +30,25 @@ class Post:
             text_fragment = self.text 
 
         return self.author_id + ' (' + str(self.date) + ')' + ': ' + str(text_fragment)
-        
+
+    def get_post_commentaries(self):
+        connection = Connection()
+        cursor = connection.start_database_connection()
+
+        cursor.execute(
+            "select * from comentario where id_postagem=%s",
+            [self.post_id]
+        )
+
+        commentaries_as_lists = cursor.fetchall()
+        commentaries = []
+
+        for commentary_as_list in commentaries_as_lists:
+            commentaries.append(Commentary(commentary_as_list))
+
+        connection.close_database_connection()
+
+        return commentaries        
 
     def _create_markups_from_this_post(self):
         connection = Connection()

@@ -6,7 +6,6 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(__file__, '../..')))
 
 from model.Connection import Connection
-from model.entities.Commentary import Commentary
 
 from control.exceptions.RepeatedPrimaryKeyException import RepeatedPrimaryKeyException
 

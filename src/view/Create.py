@@ -45,5 +45,4 @@ class PostCreate(UserView):
         
         post = Post.create_instance(text, image_path, self.logged_user)
 
-        #if post.image:
-        #    Dialog().show_image(post.image)
+        
