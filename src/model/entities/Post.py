@@ -12,6 +12,7 @@ from model.Connection import Connection
 from model.entities.Topic import Topic
 from model.entities.Commentary import Commentary
 from model.entities.Notification import Notification
+from model.relationships.Block import Block
 
 
 class Post:
@@ -33,7 +34,7 @@ class Post:
 
         return self.author_id + ' (' + str(self.date) + ')' + ': ' + str(text_fragment)
 
-    def get_post_commentaries(self):
+    def get_post_commentaries(self, logged_user_name=None):
         connection = Connection()
         cursor = connection.start_database_connection()
 
@@ -47,7 +48,10 @@ class Post:
         commentaries = []
 
         for commentary_as_list in commentaries_as_lists:
-            commentaries.append(Commentary(commentary_as_list))
+            commentary = Commentary(commentary_as_list)
+
+            if not(logged_user_name) or not(Block.block_exist(logged_user_name, commentary.author_id)):
+                commentaries.append(commentary)
 
         connection.close_database_connection()
 

@@ -27,6 +27,7 @@ class NotificationView(UserView):
             
             elif self._is_value_a_number(selected_notification_index) and ( 
                 not self._is_out_of_bounds(selected_notification_index, len(displayed_notifications))):
+                displayed_notifications = self.logged_user.get_user_notifications()
                 returned_information = self._show_selected_notification(displayed_notifications[selected_notification_index])
                 
                 if returned_information:
@@ -81,7 +82,11 @@ class NotificationView(UserView):
                 return {'command': 'access_user', 'object': User.get_user_instance(notification.id_follow_follower)}
             else:
                 return {'command': 'access_user', 'object': User.get_user_instance(notification.id_follow_follower)}
-            
+
+        elif notification.notification_type == 'follow confirmation':
+            Follow.delete_instance(User.get_user_instance(notification.id_follow_follower), User.get_user_instance(notification.id_follow_followed))
+            Notification.delete_instance(notification.notification_id)
+
         elif notification.notification_type == 'post markup':
             return {'command': 'access_post', 'object': Post.get_post_instance(notification.id_postmarkup_post)}
 

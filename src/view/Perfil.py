@@ -4,6 +4,7 @@ import sys
 sys.path.append(os.path.abspath(os.path.join('..')))
 
 from model.relationships.Follow import Follow
+from model.relationships.Block import Block
 from model.entities.User import User
 
 from view.View import UserView
@@ -207,7 +208,11 @@ class Perfil(UserView):
                   return {'command': 'show_another_perfil', 'object': perfil_user}
 
             elif not perfil_belongs_to_logged_user and selected_option in ['B']:
-                  pass
+                  if Block.block_exist(self.logged_user.user_name, perfil_user.user_name):
+                        Block.delete_instance(self.logged_user.user_name, perfil_user.user_name)
+                  else:
+                        Block.create_instance(self.logged_user.user_name, perfil_user.user_name)
+                  return {'command': 'show_another_perfil', 'object': perfil_user}
 
             elif not perfil_belongs_to_logged_user and selected_option in ['R']:
                   return {'command': 'home_logged_perfil', 'object': None} 

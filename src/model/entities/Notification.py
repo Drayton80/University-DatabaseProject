@@ -46,15 +46,20 @@ class Notification:
             title = 'Notificação de Seguimento (' + self.date + ')\n'
 
             cursor.execute(
-                "select confirmacao from seguimento where nome_seguidor=%s and nome_seguido=%s",
+                "select * from seguimento where nome_seguidor=%s and nome_seguido=%s",
                 (self.id_follow_follower, self.id_follow_followed))
 
-            confirmation = cursor.fetchone()[0]
+            follow_as_list = cursor.fetchall()
 
-            if confirmation == True:
-                text = 'O Usuário @' + self.id_follow_followed + ' aceitou seu pedido'
+            if follow_as_list:
+                confirmation = follow_as_list[0][0]
+
+                if confirmation == True:
+                    text = 'O Usuário @' + self.id_follow_followed + ' aceitou seu pedido'
+                else:
+                    text = 'O Usuário @' + self.id_follow_followed + ' negou seu pedido'
             else:
-                text = 'O Usuário @' + self.id_follow_followed + ' negou seu pedido'
+                text = ''
 
         elif self.notification_type == 'post markup':
             title = 'Notificação de Marcação (' + self.date + ')\n'
