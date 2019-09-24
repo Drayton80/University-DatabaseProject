@@ -8,6 +8,7 @@ sys.path.append(os.path.abspath(os.path.join('../..')))
 from model.Connection import Connection
 from model.entities.Post import Post
 from model.entities.Commentary import Commentary
+from model.entities.Notification import Notification
 
 class User:
     def __init__(self, user_as_list):
@@ -104,24 +105,45 @@ class User:
 
         return posts
 
-    def get_user_commentaries(self):
+    def get_user_notifications(self):
         connection = Connection()
         cursor = connection.start_database_connection()
 
         cursor.execute(
-            "select * from comentario where id_autor=%s",
+            "select * from notificacao where id_perfil=%s order by data desc",
             [self.user_name]
         )
 
-        commentaries_as_lists = cursor.fetchall()
-        commentaries = []
+        notifications_as_lists = cursor.fetchall()
+        notifications = []
 
-        for commentary_as_list in commentaries_as_lists:
-            commentaries.append(Commentary(commentary_as_list))
+        for notification_as_list in notifications_as_lists:
+            notifications.append(Notification(notification_as_list))
 
         connection.close_database_connection()
 
-        return commentaries
+        return notifications
+
+    @classmethod
+    def get_user_instance(cls, user_name):
+        connection = Connection()
+        cursor = connection.start_database_connection()
+
+        cursor.execute(
+            "select * from perfil where nome_usuario=%s",
+            [user_name]
+        )
+
+        user_as_list = cursor.fetchall()[0]
+
+        if user_as_list:
+            user = User(user_as_list)
+        else:
+            user = None
+
+        connection.close_database_connection()
+
+        return user
 
     @classmethod
     def search_users(cls, search_key, order_by=None):
@@ -151,9 +173,6 @@ class User:
 
                 all_users_informations = sorted(all_users_informations, key= lambda k: k['followers number'], reverse=True)
 
-            #for user_information in all_users_informations:
-            #    print(user_information['object'], user_information['followers number'])
-            #input()
             return [user_information['object'] for user_information in all_users_informations]
 
         except ValueError:

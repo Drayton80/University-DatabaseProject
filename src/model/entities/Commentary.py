@@ -8,6 +8,7 @@ sys.path.append(os.path.abspath(os.path.join('../..')))
 
 from model.Connection import Connection
 from model.entities.Topic import Topic
+from model.entities.Notification import Notification
 
 
 class Commentary:
@@ -54,6 +55,8 @@ class Commentary:
                         cursor.execute(
                             "insert into marcacao_comentario(nome_perfil, id_comentario) values (%s, %s)",
                             (user_name, self.commentary_id))
+                        connection._connection.commit()
+                        Notification.create_instance(user_name, id_commentarymarkup_perfil=user_name, id_commentarymarkup_commentary=self.commentary_id)
 
         connection.close_database_connection()
 
@@ -85,6 +88,26 @@ class Commentary:
         else:
             return date
 
+    @classmethod
+    def get_commentary_instance(cls, commentary_id):
+        connection = Connection()
+        cursor = connection.start_database_connection()
+
+        cursor.execute(
+            "select * from comentario where id=%s",
+            [commentary_id]
+        )
+
+        commentary_as_list = cursor.fetchall()[0]
+
+        if commentary_as_list:
+            commentary = Commentary(commentary_as_list)
+        else:
+            commentary = None
+
+        connection.close_database_connection()
+
+        return commentary
 
     # TODO checar se está funcionando corretamente
     @classmethod

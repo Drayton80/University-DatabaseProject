@@ -11,6 +11,7 @@ sys.path.append(os.path.abspath(os.path.join('../..')))
 from model.Connection import Connection
 from model.entities.Topic import Topic
 from model.entities.Commentary import Commentary
+from model.entities.Notification import Notification
 
 
 class Post:
@@ -77,6 +78,9 @@ class Post:
                         cursor.execute(
                             "insert into marcacao_postagem(nome_perfil, id_postagem) values (%s, %s)",
                             (user_name, self.post_id))
+                        
+                        connection._connection.commit()
+                        Notification.create_instance(user_name, id_postmarkup_perfil=user_name, id_postmarkup_post=self.post_id)
 
         connection.close_database_connection()
 
@@ -143,6 +147,27 @@ class Post:
         connection.close_database_connection()
 
         return posts
+
+    @classmethod
+    def get_post_instance(cls, post_id):
+        connection = Connection()
+        cursor = connection.start_database_connection()
+
+        cursor.execute(
+            "select * from postagem where id=%s",
+            [post_id]
+        )
+
+        post_as_list = cursor.fetchall()[0]
+
+        if post_as_list:
+            post = Post(post_as_list)
+        else:
+            post = None
+
+        connection.close_database_connection()
+
+        return post
 
     @classmethod
     def create_instance(cls, text, image_path, user_author):

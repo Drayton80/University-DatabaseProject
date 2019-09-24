@@ -16,7 +16,7 @@ class PostView(UserView):
     def run(self):
         displayed_user_posts = self.displayed_user.get_user_posts()
         selected_post_index = self._filter_selected_index(self._show_post_list(displayed_user_posts))
-        if not self._is_empty_field(selected_post_index):
+        if not self._is_empty_field(selected_post_index) and isinstance(selected_post_index, int):
             self.displayed_post = displayed_user_posts[selected_post_index]
         
         while True:
@@ -41,11 +41,11 @@ class PostView(UserView):
                         selected_option = self._show_selected_post(self.displayed_post, information_message='Escolha Inválida')
 
                 selected_post_index = self._filter_selected_index(self._show_post_list(displayed_user_posts))
-                if not self._is_empty_field(selected_post_index):
+                if not self._is_empty_field(selected_post_index) and isinstance(selected_post_index, int):
                     self.displayed_post = displayed_user_posts[selected_post_index]
             else:
                 selected_post_index = self._filter_selected_index(self._show_post_list(displayed_user_posts , information_message='Escolha Inválida'))
-                if not self._is_empty_field(selected_post_index):
+                if not self._is_empty_field(selected_post_index) and isinstance(selected_post_index, int):
                     self.displayed_post = displayed_user_posts[selected_post_index]
                        
     def _show_post_list(self, post_list, information_message=None):
