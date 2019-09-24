@@ -17,7 +17,7 @@ class Commentary:
             self.commentary_id = commentary_as_list[0]
             self.post_id = commentary_as_list[1]
             self.author_id = commentary_as_list[2]
-            self.date = self._date_correct_format(commentary_as_list[3])
+            self.date = commentary_as_list[3]
             self.text = commentary_as_list[4]
             
 
@@ -116,11 +116,9 @@ class Commentary:
         cursor = connection.start_database_connection()
         
         cursor.execute(
-            "select id, id_postagem, id_autor, comentario.data, texto from topico_comentario" \
-            " inner join comentario on topico_comentario.id_comentario = comentario.id "   \
-            " inner join topico on topico_comentario.id_topico = topico.nome"        \
-            " where topico.nome=%s order by case"                                  \
-            " when isdate(topico_comentario.data)=1 then convert(datetime, topico_comentario.data, 101) desc",
+            "select comentario.id, comentario.id_postagem, comentario.id_autor, comentario.data, comentario.texto from topico_comentario" \
+            " inner join comentario on topico_comentario.id_comentario = comentario.id" \
+            " where topico_comentario.id_topico=%s order by topico_comentario.data desc",
             [topic_name])
 
         commentaries_as_lists = cursor.fetchall()

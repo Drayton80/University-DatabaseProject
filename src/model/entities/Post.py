@@ -19,7 +19,7 @@ class Post:
     def __init__(self, post_as_list):
         if post_as_list:
             self.post_id = post_as_list[0]
-            self.date = self._date_correct_format(post_as_list[1]) 
+            self.date = post_as_list[1]
             self.text = post_as_list[2]
             self.image = self._image_from_image_bytes(post_as_list[3])
             self.author_id = post_as_list[4]
@@ -135,11 +135,9 @@ class Post:
         cursor = connection.start_database_connection()
         
         cursor.execute(
-            "select id, postagem.data, texto, foto, id_autor from topico_postagem" \
-            " inner join postagem on topico_postagem.id_postagem = postagem.id "   \
-            " inner join topico on topico_postagem.id_topico = topico.nome"        \
-            " where topico.nome=%s order by case"                                  \
-            " when isdate(topico_postagem.data)=1 then convert(datetime, topico_postagem.data, 101) desc",
+            "select postagem.id, postagem.data, postagem.texto, postagem.foto, postagem.id_autor from topico_postagem" \
+            " left join postagem on topico_postagem.id_postagem = postagem.id" \
+            " where topico_postagem.id_topico=%s order by topico_postagem.data desc",
             [topic_name])
 
         posts_as_lists = cursor.fetchall()
@@ -150,7 +148,7 @@ class Post:
 
         connection.close_database_connection()
 
-        return posts
+        return posts.copy()
 
     @classmethod
     def get_post_instance(cls, post_id):

@@ -12,7 +12,7 @@ from view.InputField import InputField
 from view.ViewPartition import ViewPartition
 from view.Menus import Menus
 from view.List import List
-from view.Search import SearchUser
+from view.Search import SearchUser, SearchTopic
 from view.Create import PostCreate
 from view.PostView import PostView
 from view.NotificationView import NotificationView
@@ -177,7 +177,12 @@ class Perfil(UserView):
                   return {'command': 'show_another_perfil', 'object': user_selected_on_search}
 
             elif selected_option in ['5']:
-                  pass
+                  post_selected_on_search = SearchTopic(self.logged_user).run()
+
+                  if post_selected_on_search:
+                        return {'command': 'access_post', 'object': post_selected_on_search}
+                  else:
+                        return {'command': 'home_logged_perfil', 'object': None}
 
             elif perfil_belongs_to_logged_user and selected_option in ['C']:
                   PostCreate(self.logged_user).run()
